@@ -1,4 +1,4 @@
-# spectral_spatial
+# SpectralSpatial
 first github respository
 
 hoping to learn more soon
