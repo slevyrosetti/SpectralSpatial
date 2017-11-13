@@ -1,6 +1,6 @@
 # SpectralSpatial
 Files for producing spectral and spectral-spatial prewinding RF pulses for MRI <br />
-Based on S. N. Williams, J-F. Nielsen, J.A. Fessler, and D.C. Noll, "Design of spectral-spatial phase prewinding pulses and their use in small-tip fast recovery steady-state imaging", Magnetic Resonance in Medicine, 2017 Early View <br />
+Based on S. N. Williams, J-F. Nielsen, J.A. Fessler, and D.C. Noll, "Design of spectral-spatial phase prewinding pulses and their use in small-tip fast recovery steady-state imaging", Magnetic Resonance in Medicine, 2017 http://onlinelibrary.wiley.com/doi/10.1002/mrm.26794/abstract <br />
 <br />
 Files found at: [https://github.com/sydneynw/SpectralSpatial/](https://github.com/sydneynw/SpectralSpatial/)<br />
 <br />
