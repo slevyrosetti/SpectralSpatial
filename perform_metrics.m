@@ -55,14 +55,14 @@ function [mean_mxy, perstd_mxy, sNRMSE_mxy, magNRMSE_mxy, phsRMSE_mxy] = perform
         set(0,'defaultAxesFontName', 'Times');
        % set(0,'defaultFontName', 'Times');
         figure; 
-        subplot(121); im(x,y,fliplr(abs_meanFBloch)/sin(nom_fa*pi/180),'cbar',[0 1],...
+        subplot(121); im(x,y,(abs_meanFBloch)/sin(nom_fa*pi/180),'cbar',[0 1],...
             sprintf('Excitation \n NRMSE=%1.2f',sNRMSE_mxy)); colormap(gca,'gray'); 
             ylabel('y (cm)'); set(gca,'xtick',[-12 0 11.8],'xTickLabel',{'-12', '0','12'}); 
             set(gca,'ytick',[-12 0 11.8],'yTickLabel',{'-12', '0','12'}); xlabel('x (cm)');
             set(gca,'Position',[0.1050    0.1010    0.3050    0.7500]);
             h=colorbar; ylabel(h,'Normalized Magnitude','FontSize',12,'FontName','Times'); 
             set(h,'ytick',[0 0.5 1],'yTickLabel',{'0','0.5','1.0'},'FontSize',12);
-        subplot(122); im(x,y,fliplr(angle_meanFBloch),[-180 180],'cbar',...
+        subplot(122); im(x,y,(angle_meanFBloch),[-180 180],'cbar',...
             sprintf('Bloch \n phase RMSE=%2.1f%c',phsRMSE_mxy,char(176))); colormap(gca,'hsv');
             ylabel('y (cm)'); set(gca,'xtick',[-12 0 11.8],'xTickLabel',{'-12', '0','12'});
             set(gca,'ytick',[-12 0 11.8],'yTickLabel',{'-12', '0','12'}); xlabel('x (cm)');

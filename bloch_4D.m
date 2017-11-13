@@ -74,7 +74,7 @@ gye = [gy; zeros(necho,1)];
 gze = [gz; zeros(necho,1)];
 % 4D Bloch simulation
 [mBloch, ~,fBloch] = parallel_Bloch4D(0,b1e,gxe,gye,gze,sens,simuRange.x,...
-    simuRange.y,simuRange.z,arg.dt,fliplr(b0mapz),fliplr(roiz),T1,T2,minf,maxf,arg.fsamp,mode);
+    simuRange.y,simuRange.z,arg.dt,(b0mapz),(roiz),T1,T2,minf,maxf,arg.fsamp,mode);
 fprintf('done.');
 
 return

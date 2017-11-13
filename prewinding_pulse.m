@@ -85,7 +85,7 @@ if pulseType ==1                 	% spectral pulse design
    save Aspec.mat Atd Wtd;
 elseif pulseType == 2           	% spectral-spatial pulse design
     [btd,gxtd,gytd,gztd,mtd_approx,ftd,dtd, circ,kxtd,kytd,kztd,Atd,Wtd]= spectralspatialRF(d_td_est,b0map,roi,arg.Trf,FOV,FOV,arg.undersamp,arg.undersamp,zslice,arg.targetf*1e-3,arg.ktype);
-    [b12, gx2, gy2, gz2, mhat12, f12, d12, circ12, kx2, ky2, kz2, A12, W12]= spectralspatialRF(d_td_est, b0map, roi, Trf, FOV, FOV, undersamp, undersamp, zslice, targetf*1e-3, ktype);
+    %[b12, gx2, gy2, gz2, mhat12, f12, d12, circ12, kx2, ky2, kz2, A12, W12]= spectralspatialRF(d_td_est, b0map, roi, Trf, FOV, FOV, undersamp, undersamp, zslice, targetf*1e-3, ktype);
     save Aspecspat.mat Atd Wtd;                                                                  
 else
 end
@@ -134,9 +134,9 @@ end
 d=d_td_est(:,:,zslice);        % 2D target pattern
 necho=round(Tread/2/dt);       % number of time samples at echo time (halfway through free precession)
 b1e = [btd; zeros(necho,1)];   % simulate the excitation pattern at the echo time 
-gxe = [-gxtd; zeros(necho,1)];        
-gye = [-gytd; zeros(necho,1)];
-gze = [-gztd; zeros(necho,1)];
+gxe = [gxtd; zeros(necho,1)];        
+gye = [gytd; zeros(necho,1)];
+gze = [gztd; zeros(necho,1)];
 
 m_atEcho=parallel_blochCim(0,b1e,gxe,gye,gze,arg.sens(:,:,:,zslice),simuRange.x,...
     simuRange.y,simuRange.z(zslice),dt*1e-3,b0map(:,:,zslice),roi(:,:,zslice),T1*1e-3,T2*1e-3);
