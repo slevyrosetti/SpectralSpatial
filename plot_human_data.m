@@ -55,7 +55,8 @@ subplot(224); im(x,y,(angle(meanFBloch_specspat)*180/pi),'cbar',[-180 180]); col
     set(gca,'ytick',[-12 0 11.8],'yTickLabel',{'-12', '0','12'}); 
     c=colorbar; ylabel(c,'Phase (\circ)'); set(c,'ytick',[-180 0 180],'yTickLabel',{'180','0','180'});
     set(gca,'Position', [0.5513 0.0980 0.1825 0.3625]);
-suptitle('Bloch Simulated Images');
+% suptitle('Bloch Simulated Images');
+sgtitle('Bloch Simulated Images');  % SLR: adapt to R2021a
 % plots experimental images
 [nxh,nyh]=size(im_spec);                    % computes x-y vectors for high(er) resolution experimental images
 FOV=24; 
@@ -85,7 +86,8 @@ subplot(224); im(xh,yh,fliplr(relphase_specspat),'cbar',[-180 180]); colormap(gc
     set(gca,'ytick',[-12 0 11.8],'yTickLabel',{'-12', '0','12'}); 
     c=colorbar; ylabel(c,'Phase (\circ)'); set(c,'ytick',[-180 0 180],'yTickLabel',{'180','0','180'});
     set(gca,'Position', [0.5900 0.0980 0.1825 0.3625]);
-suptitle('Experimental Images');  
+% suptitle('Experimental Images');  
+sgtitle('Experimental Images');  % SLR: adapt to R2021a
 
 % excitation NRMSE and Phase RMSE over spatial locations
 angle_meanFBloch_hard=angle(meanFBloch_hard)*180/pi;

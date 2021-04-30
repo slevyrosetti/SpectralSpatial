@@ -149,7 +149,8 @@ if arg.doplot==1
     subplot(122); im(simuRange.x,simuRange.y,angle(m_atEcho)*180/pi,[-180 180]); 
     colormap(gca,'hsv'); xlabel('x (cm'); ylabel('y (cm)'); h=colorbar; 
     ylabel(h,'Phase (\circ)'); title('Phase');
-    suptitle('Magnetization at TE');
+%     suptitle('Magnetization at TE');
+    sgtitle('Magnetization at TE');  % SLR: adapt to R2021a
 end
     
 % After tip-up
@@ -169,7 +170,8 @@ if seqType==1
         subplot(122); im(simuRange.x,simuRange.y,angle(m_afterTipup)*180/pi,[-180 180]); 
         colormap(gca,'hsv'); xlabel('x (cm'); ylabel('y (cm)'); h=colorbar; 
         ylabel(h,'Phase (\circ)'); title('Phase');
-        suptitle('Magnetization after Tip-up');
+%         suptitle('Magnetization after Tip-up');
+        sgtitle('Magnetization after Tip-up');  % SLR: adapt to R2021a
     end
 else
     m_afterTipup=0;

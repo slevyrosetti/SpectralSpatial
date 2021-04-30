@@ -69,7 +69,9 @@ function [mean_mxy, perstd_mxy, sNRMSE_mxy, magNRMSE_mxy, phsRMSE_mxy] = perform
             set(gca,'Position',[0.5700    0.1015    0.3050    0.7500]);
             h=colorbar; ylabel(h,'Phase (\circ)','FontSize',12,'FontName','Times'); 
             set(h,'ytick',[-180 0 180],'yTickLabel',{'-180','0','180'},'FontSize',12);
-        suptitle(sprintf('Mean Magnitude=%1.2f, Percent St.Dev=%2.1f%c, \n Magnitude NRMSE=%1.2f',...
-            mean_mxy, perstd_mxy, char(37), magNRMSE_mxy));
+%         suptitle(sprintf('Mean Magnitude=%1.2f, Percent St.Dev=%2.1f%c, \n Magnitude NRMSE=%1.2f',...
+%             mean_mxy, perstd_mxy, char(37), magNRMSE_mxy));
+        sgtitle(sprintf('Mean Magnitude=%1.2f, Percent St.Dev=%2.1f%c, \n Magnitude NRMSE=%1.2f',...
+            mean_mxy, perstd_mxy, char(37), magNRMSE_mxy));  % SLR: adapt to R2021a
     end
 end
