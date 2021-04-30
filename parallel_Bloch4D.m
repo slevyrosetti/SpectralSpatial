@@ -43,7 +43,8 @@ function [Mxy_full, Mz_full,f]=parallel_Bloch4D(Minit,pulses,gx,gy,gz,sens,x,y,z
             Mz_full(:,:,:,i)=mz;                % longitudinal magnetization at f(i)
         elseif ndims(mxy)<3
             Mxy_full(:,:,i)=mxy;              % transverse magnetization at f(i)
-            Mz_full(:,:,i)=mz;                % longitudinal magnetization at f(i)
+%             Mz_full(:,:,i)=mz;                % longitudinal magnetization at f(i)
+            Mz_full(:,:,i)=reshape(mz, size(b0map, 1), size(b0map, 2)); % SLR: reshape to the size of the B0 map slice (older Matlab versions probably did not need to do that explicitly)
         end
         sprintf('niter: %2.1f out of %2.1f',i,nf+1)
     end
