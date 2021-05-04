@@ -56,6 +56,7 @@ arg.ktype=9;                        % default spectral-spatial excitation trajec
 arg.undersamp=4;                    % default full spectral bandwidth
 arg.spec_band=0;                    % default full spectral bandwidth
 arg.Trf=3e-3;                       % default RF pulse length in sec
+% arg.Trf=6e-3;                       % (SLR) default RF pulse length in sec
 arg.sens=ones(1,nx,ny,nz);          % default sensitivity maps
 arg.doplot=0;                       % default plotting
 arg=vararg_pair(arg, varargin);     % reads in user-provided values
@@ -76,6 +77,7 @@ end
 
 tstart1=tic;
 theta_est=-2*pi*b0map*(Tread)/1e3;  % initial/nominal phase pattern
+% theta_est=zeros(size(b0map)); % (SLR) assume no initial phase
 theta_est(~roi)=0;                  % windows out don't care region
 magnom=ones(size(theta_est))*sin(nom_fa*pi/180);    % initial/nominal magnitude pattern
 d_td_est=magnom.*exp(0.5*-1i*theta_est);            % initial/nominal design for prewinding pulse
@@ -91,48 +93,49 @@ else
 end
 tipdownDesignTime=toc(tstart1);
 
-%% Simulate after free precession and design tip-up pulse (if STFR)
-
-if seqType==1
-    % RF/gradient out to free precession
-    nread = round(Tread/dt);            % number of time samples in readout (free precession time)
-    b1d = [btd; zeros(nread,1)];
-    gxd = [gxtd; zeros(nread,1)];
-    gyd = [gytd; zeros(nread,1)];
-    gzd = [gztd; zeros(nread,1)];
-    % Bloch simulation of magnetization after free precession
-    [m_beforeTipup,mz_beforeTipup]=parallel_blochCim(0,b1d,gxd,gyd,gzd,arg.sens(:,:,:,zslice), simuRange.x,...
-        simuRange.y,simuRange.z(zslice),dt*1e-3,b0map(:,:,zslice),roi(:,:,zslice),T1*1e-3,T2*1e-3);
-    d_tu_est=m_beforeTipup;                  % target pattern for tipup pulse
-    d_tu_est=repmat(d_tu_est,[1 1 nz]);      % fills across 3D space (we only care about z-th slice)
-    % design tip-up pulse to match magnetization pattern after free precession
-    tstart2=tic;
-    if pulseType == 1                   % spectral pulse
-        [btu,gxtu,gytu,gztu, mtu_approx, ftu, dtu, Atu, Wtu] = spectralRF(d_tu_est, -1*b0map,roi, arg.Trf, 0, zslice,fspec);
-        save Aspec.mat Atu Wtu -append;
-    elseif pulseType == 2;              % spectral-spatial pulse
-        [btu,gxtu,gytu,gztu,mtu_approx,ftu,dtu, circ,kxtu,kytu,kztu,Atu,Wtu]= spectralspatialRF(d_tu_est,-1*b0map,roi,arg.Trf,FOV,FOV,arg.undersamp,arg.undersamp,zslice,arg.targetf*1e-3,arg.ktype);
-        save Aspecspat.mat Atu Wtu -append;
-    end
-    tipupDesignTime=toc(tstart2);
-    btu=-flipud(btu);                  % Negate and time-reverse tip-up RF pulse and gradients
-    gxtu=-flipud(gxtu);
-    gytu=-flipud(gytu);
-    gztu=-flipud(gztu);
-elseif seqType==2
-    btu=zeros(length(btd),1);           % No tip-up pulse for SPGR
-    gxtu=zeros(length(gxtd),1);
-    gytu=zeros(length(gytd),1);
-    gztu=zeros(length(gztd),1);
-    tipupDesignTime=0;
-    m_beforeTipup=0;
-end
+% %% Simulate after free precession and design tip-up pulse (if STFR)
+% 
+% if seqType==1
+%     % RF/gradient out to free precession
+%     nread = round(Tread/dt);            % number of time samples in readout (free precession time)
+%     b1d = [btd; zeros(nread,1)];
+%     gxd = [gxtd; zeros(nread,1)];
+%     gyd = [gytd; zeros(nread,1)];
+%     gzd = [gztd; zeros(nread,1)];
+%     % Bloch simulation of magnetization after free precession
+%     [m_beforeTipup,mz_beforeTipup]=parallel_blochCim(0,b1d,gxd,gyd,gzd,arg.sens(:,:,:,zslice), simuRange.x,...
+%         simuRange.y,simuRange.z(zslice),dt*1e-3,b0map(:,:,zslice),roi(:,:,zslice),T1*1e-3,T2*1e-3);
+%     d_tu_est=m_beforeTipup;                  % target pattern for tipup pulse
+%     d_tu_est=repmat(d_tu_est,[1 1 nz]);      % fills across 3D space (we only care about z-th slice)
+%     % design tip-up pulse to match magnetization pattern after free precession
+%     tstart2=tic;
+%     if pulseType == 1                   % spectral pulse
+%         [btu,gxtu,gytu,gztu, mtu_approx, ftu, dtu, Atu, Wtu] = spectralRF(d_tu_est, -1*b0map,roi, arg.Trf, 0, zslice,fspec);
+%         save Aspec.mat Atu Wtu -append;
+%     elseif pulseType == 2;              % spectral-spatial pulse
+%         [btu,gxtu,gytu,gztu,mtu_approx,ftu,dtu, circ,kxtu,kytu,kztu,Atu,Wtu]= spectralspatialRF(d_tu_est,-1*b0map,roi,arg.Trf,FOV,FOV,arg.undersamp,arg.undersamp,zslice,arg.targetf*1e-3,arg.ktype);
+%         save Aspecspat.mat Atu Wtu -append;
+%     end
+%     tipupDesignTime=toc(tstart2);
+%     btu=-flipud(btu);                  % Negate and time-reverse tip-up RF pulse and gradients
+%     gxtu=-flipud(gxtu);
+%     gytu=-flipud(gytu);
+%     gztu=-flipud(gztu);
+% elseif seqType==2
+%     btu=zeros(length(btd),1);           % No tip-up pulse for SPGR
+%     gxtu=zeros(length(gxtd),1);
+%     gytu=zeros(length(gytd),1);
+%     gztu=zeros(length(gztd),1);
+%     tipupDesignTime=0;
+%     m_beforeTipup=0;
+% end
 
 %% Full pulse simulations: 1) At TE (STFR and SPGR) 2) After tip-up (STFR only)
 
 % At TE
 d=d_td_est(:,:,zslice);        % 2D target pattern
-necho=round(Tread/2/dt);       % number of time samples at echo time (halfway through free precession)
+% necho=round(Tread/2/dt);       % number of time samples at echo time (halfway through free precession)
+necho=1;                       % (SLR) number of time samples at echo time (halfway through free precession)
 b1e = [btd; zeros(necho,1)];   % simulate the excitation pattern at the echo time 
 gxe = [gxtd; zeros(necho,1)];        
 gye = [gytd; zeros(necho,1)];
@@ -149,33 +152,32 @@ if arg.doplot==1
     subplot(122); im(simuRange.x,simuRange.y,angle(m_atEcho)*180/pi,[-180 180]); 
     colormap(gca,'hsv'); xlabel('x (cm'); ylabel('y (cm)'); h=colorbar; 
     ylabel(h,'Phase (\circ)'); title('Phase');
-%     suptitle('Magnetization at TE');
-    sgtitle('Magnetization at TE');  % SLR: adapt to R2021a
+    sgtitle('Magnetization after 1 time sample');
 end
     
-% After tip-up
-
-if seqType==1
-    b1f = [btd; zeros(nread,1); btu];% Full STFR RF pulse and gradient waveforms
-    gxf = [gxtd; zeros(nread,1); gxtu];
-    gyf = [gytd; zeros(nread,1); gytu];
-    gzf = [gztd; zeros(nread,1); gztu];
-    m_afterTipup=parallel_blochCim(0,b1f,gxf,gyf,gzf,arg.sens(:,:,:,zslice), simuRange.x,...
-        simuRange.y,simuRange.z(zslice),dt*1e-3,b0map(:,:,zslice),roi(:,:,zslice),T1*1e-3,T2*1e-3);
-    if arg.doplot==1
-        figure; 
-        subplot(121); im(simuRange.x,simuRange.y,abs(m_afterTipup)/sin(nom_fa*pi/180),[0 1]); 
-        colormap(gca,'default'); xlabel('x (cm'); ylabel('y (cm)'); h=colorbar; 
-        ylabel(h,'Normalized Magnitude'); title('Magnitude');
-        subplot(122); im(simuRange.x,simuRange.y,angle(m_afterTipup)*180/pi,[-180 180]); 
-        colormap(gca,'hsv'); xlabel('x (cm'); ylabel('y (cm)'); h=colorbar; 
-        ylabel(h,'Phase (\circ)'); title('Phase');
-%         suptitle('Magnetization after Tip-up');
-        sgtitle('Magnetization after Tip-up');  % SLR: adapt to R2021a
-    end
-else
+% % After tip-up
+% 
+% if seqType==1
+%     b1f = [btd; zeros(nread,1); btu];% Full STFR RF pulse and gradient waveforms
+%     gxf = [gxtd; zeros(nread,1); gxtu];
+%     gyf = [gytd; zeros(nread,1); gytu];
+%     gzf = [gztd; zeros(nread,1); gztu];
+%     m_afterTipup=parallel_blochCim(0,b1f,gxf,gyf,gzf,arg.sens(:,:,:,zslice), simuRange.x,...
+%         simuRange.y,simuRange.z(zslice),dt*1e-3,b0map(:,:,zslice),roi(:,:,zslice),T1*1e-3,T2*1e-3);
+%     if arg.doplot==1
+%         figure; 
+%         subplot(121); im(simuRange.x,simuRange.y,abs(m_afterTipup)/sin(nom_fa*pi/180),[0 1]); 
+%         colormap(gca,'default'); xlabel('x (cm'); ylabel('y (cm)'); h=colorbar; 
+%         ylabel(h,'Normalized Magnitude'); title('Magnitude');
+%         subplot(122); im(simuRange.x,simuRange.y,angle(m_afterTipup)*180/pi,[-180 180]); 
+%         colormap(gca,'hsv'); xlabel('x (cm'); ylabel('y (cm)'); h=colorbar; 
+%         ylabel(h,'Phase (\circ)'); title('Phase');
+% %         suptitle('Magnetization after Tip-up');
+%         sgtitle('Magnetization after Tip-up');  % SLR: adapt to R2021a
+%     end
+% else
     m_afterTipup=0;
-end
+% end
 
 return
 

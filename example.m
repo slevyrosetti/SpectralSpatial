@@ -40,7 +40,7 @@
 %
 load PrewindingPulse.mat                                % loads in pre-computed field map and some acquisition/design details
 pulseType=1;                                            % RF pulse type for design, 1: purely spectral 2: spectral-spatial
-seqType=1;                                              % pulse sequence, 1: STFR 2: SPGR 
+seqType=2;                                              % pulse sequence, 1: STFR 2: SPGR 
 %% Pulse Design
 % spectral
 [btd_spec,gxtd_spec,gytd_spec,gztd_spec,...         % designs tip-down (and tip-up) prewinding pulse set
@@ -48,10 +48,8 @@ seqType=1;                                              % pulse sequence, 1: STF
     d,m_atEcho_spec,m_beforeTipup_spec,m_afterTipup_spec]=prewinding_pulse(pulseType,...
     seqType, b0map, roi, simuRange,zslice,nom_fa, Tread, 'doplot',1);
 % spectral-spatial
-[btd_specspat,gxtd_specspat,gytd_specspat,gztd_specspat,...% designs tip-down (and tip-up) prewinding pulse set
-   btu_specspat,gxtu_specspat,gytu_specspat,gztu_specspat,...
-   d,m_atEcho_specspat,m_beforeTipup_specspat,m_afterTipup_specspat]=prewinding_pulse((pulseType+1),...
-   seqType, b0map, roi, simuRange,zslice,nom_fa, Tread, 'doplot',1);
+% designs tip-down (and tip-up) prewinding pulse set
+[btd_specspat,gxtd_specspat,gytd_specspat,gztd_specspat, btu_specspat,gxtu_specspat,gytu_specspat,gztu_specspat, d,m_atEcho_specspat,m_beforeTipup_specspat,m_afterTipup_specspat]=prewinding_pulse((pulseType+1), seqType, b0map, roi, simuRange,zslice,nom_fa, Tread, 'doplot',1);
 % here, we want uniform magnetization and zero phase at TE
 % we also want zero magnetization after tip-up (don't care about phase)
 %% Bloch Simulation/Performance Metrics

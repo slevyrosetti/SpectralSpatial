@@ -78,19 +78,37 @@ bmap=fm(1:underx:end,1:undery:end,zslice)*1e-3;     % downsamples field map, con
 circ=roi(1:underx:end,1:undery:end,zslice);         % downsamples ROI
 
 %% Spectral-spatial Design Setup
-df=10*1e-3;                                         % sampling rate, 0.01kHz or 10Hz
-wtype=1;                                            % type of weighting matrix (1 trad. specspat, 2 varying weight specspat, 3 purely spectral)
-shape=1;                                            % shape of weighting matrix used (1 rect.m 2 Gaussian spread)
-[W,f,b0map_tp,Nmap]=weight_matrix...
-    (bmap,circ,df,targetf,wtype,shape);             % creates weighting matrix and sampled frequency vector
-minf=min(f); maxf=max(f); nobj_f=length(f);         % descriptor variables about sampled frequencies
-[F, X, Y]=ndgrid(f, x, y);                          % grids frequency and spatial samples
+% df=10*1e-3;                                         % sampling rate, 0.01kHz or 10Hz
+% wtype=1;                                            % type of weighting matrix (1 trad. specspat, 2 varying weight specspat, 3 purely spectral)
+% shape=1;                                            % shape of weighting matrix used (1 rect.m 2 Gaussian spread)
+% [W,f,b0map_tp,Nmap, b0map_val]=weight_matrix...
+%     (bmap,circ,df,targetf,wtype,shape);             % creates weighting matrix and sampled frequency vector
+% minf=min(f); maxf=max(f); nobj_f=length(f);         % descriptor variables about sampled frequencies
+% [F, X, Y]=ndgrid(f, x, y);                          % grids frequency and spatial samples
 %spsp=[F(:) X(:) Y(:)].';                            % stacks two row vectors   
 t=time-tau;                                         % backwards time for spectral design
 %kspace=[t kx ky];                                   % stacks spectral time and k-space trajectory into two column vectors
-d=mxy_abs*exp(1i*2*pi*f*tfree/2);                   % target design d
-d=repmat(d.',[1 nobj_x nobj_y]);                    % replicates spectral design matrix over length of spatial domain
-  
+% d=mxy_abs*exp(1i*2*pi*f*tfree/2);                   % target design d
+% d=repmat(d.',[1 nobj_x nobj_y]);                    % replicates spectral design matrix over length of spatial domain
+
+% =========================================================================
+% SLR: design 3D target pattern (fXxXy)for fat saturation pulse
+alpha=90;
+f_fat=-3.3*127.74;
+minf=1.1*f_fat;                                     % take margins
+maxf=100;                                           % include water frequency
+df=10;                                              % sampling rate of 10Hz
+f=minf:df:maxf;                                     % frequency axis
+nobj_f=length(f);                                   % number of sampling frequencies
+[~, ~, Y]=ndgrid(f, x, y);                          % grids frequency and spatial samples
+exc_BW=50;                                          % excitation (for fat) and non-excitation (for water) BW of 50Hz
+d=zeros(nobj_f, nobj_x, nobj_y);                   % placeholder for the 3D target pattern
+d((f_fat-exc_BW/2) < f < (f_fat+exc_BW/2), :, :)=deg2rad(alpha);  % 90 degree flip angle aroung fat and 0 elsewhere
+W=zeros(nobj_f, nobj_x, nobj_y);                   % placeholder for the weighting matrix
+W((f_fat-exc_BW/2) < f < (f_fat+exc_BW/2), :, :)=1; % optimize pulse around the fat frequency
+W((-exc_BW/2) < f < (exc_BW/2), :, :)=1;            % optimize pulse around the water frequency
+% =========================================================================
+
 N=size(Y);                                          % for use in Gnufft fatrix object
 nshift_x=N(2)/2;                                    % centers X dimension
 nshift_y=N(3)/2;                                    % centers Y dimension
