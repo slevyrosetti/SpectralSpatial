@@ -1,4 +1,4 @@
-function [b1, gx,gy,gz, m_approx, f, d, circ, kx,ky,kz, A, W, time] = spectralspatialRF(d,b0map,roi,Trf,FOV_x,FOV_y,underx,undery,zslice,targetf,ktype,varargin)
+function [b1, gx,gy,gz, m_approx, f, d, circ, kx,ky,kz, A, W, time] = spectralspatialRF(d,b0map,roi,Trf,FOV_x,FOV_y,underx,undery,zslice,targetf,ktype,nom_fa,varargin)
 % function [b1, gx,gy,gz, m_approx, f, d, circ, kx,ky,kz, A, W] = spectralspatialRF(d,b0map,roi,Trf,FOV_x,FOV_y,underx,undery,zslice,targetf,ktype,varargin)
 % Design spectral-spatial prewinding tip down pulse with 2D spatial inhomogenity correction using a pre-loaded fieldmap
 % By Sydney Williams, University of Michigan, 2016
@@ -92,23 +92,17 @@ t=time-tau;                                         % backwards time for spectra
 
 % =========================================================================
 % SLR: design 3D target pattern (fXxXy)for fat saturation pulse
-nom_fa=90;                                          % required flip angle in degrees
-f_fat=-3.3*127.74;                                  % fat frequency at 3T
-minf=1.1*f_fat;                                     % take margins
-maxf=100;                                           % include water frequency
-df=10;                                              % sampling rate of 10Hz
-f=minf:df:maxf;                                     % frequency axis
-nobj_f=length(f);                                   % number of sampling frequencies
-[~, ~, Y]=ndgrid(f, x, y);                          % grids frequency and spatial samples
-exc_BW=50;                                          % excitation (for fat) and non-excitation (for water) BW of 50Hz
-d=zeros(nobj_f, nobj_x, nobj_y);                   % placeholder for the 3D target pattern
-d((f_fat-exc_BW/2) < f & f < (f_fat+exc_BW/2), :, :)=sind(nom_fa);  % 90 degree flip angle aroung fat and 0 elsewhere
+[d, f, minf, maxf, nobj_f] = design_target_pattern_fat_sat(nom_fa,bmap*1e3,circ,3); % design target pattern
+% d=zeros(nobj_f, nobj_x, nobj_y);                   % placeholder for the 3D target pattern
+% d((f_fat-exc_BW/2) < f & f < (f_fat+exc_BW/2), :, :)=sind(nom_fa);  % 90 degree flip angle aroung fat and 0 elsewhere
 % W=zeros(nobj_f, nobj_x, nobj_y);                   % placeholder for the weighting matrix
 % W((f_fat-exc_BW/2) < f & f < (f_fat+exc_BW/2), :, :)=1; % optimize pulse around the fat frequency
 % W((-exc_BW/2) < f & f < (exc_BW/2), :, :)=1;            % optimize pulse around the water frequency
-W=ones(nobj_f, nobj_x, nobj_y);
+W=ones(length(f), nobj_x, nobj_y);                     % we only want the fat to be saturated so we care about all frequencies
+W(:, ~circ)=0;                                          % we only care about the object
 % =========================================================================
 
+[~, ~, Y]=ndgrid(f, x, y);                          % grids frequency and spatial samples
 N=size(Y);                                          % for use in Gnufft fatrix object
 nshift_x=N(2)/2;                                    % centers X dimension
 nshift_y=N(3)/2;                                    % centers Y dimension

@@ -75,7 +75,7 @@ end
 
 %% Design tip-down pulse
 
-nom_fa=90;                          % required flip angle in degrees
+nom_fa=90;                          % nominal flip angle in degrees
 tstart1=tic;
 theta_est=-2*pi*b0map*(Tread)/1e3;  % initial/nominal phase pattern
 % theta_est=zeros(size(b0map)); % (SLR) assume no initial phase
@@ -87,7 +87,7 @@ if pulseType ==1                 	% spectral pulse design
    [btd,gxtd,gytd,gztd, mtd_approx, ftd, dtd, Atd, Wtd] = spectralRF(d_td_est,b0map,roi,arg.Trf,0,zslice,fspec);
    save Aspec.mat Atd Wtd;
 elseif pulseType == 2           	% spectral-spatial pulse design
-    [btd,gxtd,gytd,gztd,mtd_approx,ftd,d, circ,kxtd,kytd,kztd,Atd,Wtd, time]= spectralspatialRF(d_td_est,b0map,roi,arg.Trf,FOV,FOV,arg.undersamp,arg.undersamp,zslice,arg.targetf*1e-3,arg.ktype);
+    [btd,gxtd,gytd,gztd,mtd_approx,ftd,d, circ,kxtd,kytd,kztd,Atd,Wtd, time]= spectralspatialRF(d_td_est,b0map,roi,arg.Trf,FOV,FOV,arg.undersamp,arg.undersamp,zslice,arg.targetf*1e-3,arg.ktype,nom_fa);
     %[b12, gx2, gy2, gz2, mhat12, f12, d12, circ12, kx2, ky2, kz2, A12, W12]= spectralspatialRF(d_td_est, b0map, roi, Trf, FOV, FOV, undersamp, undersamp, zslice, targetf*1e-3, ktype);
     save Aspecspat.mat Atd Wtd;                                                                  
 else
@@ -108,18 +108,18 @@ gze = [gztd; zeros(necho,1)];
 % m_atEcho=parallel_blochCim(0,b1e,gxe,gye,gze,arg.sens(:,:,:,zslice),simuRange.x,...
 %    simuRange.y,simuRange.z(zslice),dt*1e-3,b0map(:,:,zslice),roi(:,:,zslice),T1*1e-3,T2*1e-3);
 % =========================================================================
-% SLR: simulate without the B0 map first
-
+% SLR: try to simulate water and fat magnetization to see the effect of the
+% pulse
 % simulate water magnetization
-b0map_water_uniform = ones(size(b0map))*0;
+% b0map_water_uniform = ones(size(b0map))*0;
 m_atEcho=parallel_blochCim(0,b1e,gxe,gye,gze,arg.sens(:,:,:,zslice),simuRange.x,...
-    simuRange.y,simuRange.z(zslice),dt*1e-3,b0map_water_uniform(:,:,zslice),roi(:,:,zslice),T1*1e-3,T2*1e-3);
+    simuRange.y,simuRange.z(zslice),dt*1e-3,b0map(:,:,zslice),roi(:,:,zslice),T1*1e-3,T2*1e-3);
 
 % simulate fat by adding an offset to the B0 map
 % b0map_fat = b0map - 3.3*127.74;
-b0map_fat_uniform = ones(size(b0map))*(-3.3*127.74);
+% b0map_fat_uniform = ones(size(b0map))*(-3.3*127.74);
 mFat_atEcho=parallel_blochCim(0,b1e,gxe,gye,gze,arg.sens(:,:,:,zslice),simuRange.x,...
-    simuRange.y,simuRange.z(zslice),dt*1e-3,b0map_fat_uniform(:,:,zslice),roi(:,:,zslice),T1*1e-3,T2*1e-3);;
+    simuRange.y,simuRange.z(zslice),dt*1e-3,b0map(:,:,zslice),roi(:,:,zslice),T1*1e-3,T2*1e-3);
 
 if arg.doplot==1
     figure; 
